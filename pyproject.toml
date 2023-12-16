@@ -12,9 +12,38 @@ fastapi = "^0.104.1"
 sqlalchemy = "^2.0.23"
 uvicorn = "^0.24.0.post1"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+taskipy = "^1.12.2"
+blue = "^0.9.1"
+ruff = "^0.1.8"
+httpx = "^0.25.2"
+isort = "^5.13.2"
+
+[tool.ruff]
+line-length = 79
+exclude = ['.venv', 'migrations']
+
+[tool.isort]
+profile = "black"
+line_length = 79
+extend_skip = ['migrations']
+
+[tool.pytest.ini_options]
+pythonpath = "."
+
+[tool.blue]
+extend-exclude = '(migrations/)'
+
+[tool.taskipy.tasks]
+lint = 'ruff . && blue --check . --diff'
+format = 'blue .  && isort .'
+run = 'uvicorn api.app:app --reload'
+pre_test = 'task lint'
+test = 'pytest -s -x --cov=api -vv'
+post_test = 'coverage html'
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-start="api.main:start"
